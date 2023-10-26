@@ -1,718 +1,1291 @@
----
-swagger: "2.0"
+swagger: '2.0'
 info:
-  description: "This is a sample server Petstore server.  You can find out more about\
-    \ Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).\
-    \  For this sample, you can use the api key `special-key` to test the authorization\
-    \ filters."
-  version: "1.0.5"
-  title: "Swagger Petstore"
-  termsOfService: "http://swagger.io/terms/"
-  contact:
-    email: "apiteam@swagger.io"
-  license:
-    name: "Apache 2.0"
-    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-host: "petstore.swagger.io"
-basePath: "/v2"
-tags:
-- name: "pet"
-  description: "Everything about your Pets"
-  externalDocs:
-    description: "Find out more"
-    url: "http://swagger.io"
-- name: "store"
-  description: "Access to Petstore orders"
-- name: "user"
-  description: "Operations about user"
-  externalDocs:
-    description: "Find out more about our store"
-    url: "http://swagger.io"
+  version: '1.0'
+  title: BUMA DSM
+  contact: {}
+host: buma.predictdsm.com
+basePath: /api/v2/driverbehaviour
+securityDefinitions: {}
 schemes:
-- "https"
-- "http"
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
 paths:
-  /pet/{petId}/uploadImage:
+  /encode:
     post:
+      summary: Encode
       tags:
-      - "pet"
-      summary: "uploads an image"
-      description: ""
-      operationId: "uploadFile"
+        - V2
+      operationId: Encode
+      deprecated: false
+      produces:
+        - application/json
       consumes:
-      - "multipart/form-data"
-      produces:
-      - "application/json"
+        - application/json
       parameters:
-      - name: "petId"
-        in: "path"
-        description: "ID of pet to update"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "additionalMetadata"
-        in: "formData"
-        description: "Additional data to pass to server"
-        required: false
-        type: "string"
-      - name: "file"
-        in: "formData"
-        description: "file to upload"
-        required: false
-        type: "file"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/ApiResponse"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-  /pet:
-    post:
-      tags:
-      - "pet"
-      summary: "Add a new pet to the store"
-      description: ""
-      operationId: "addPet"
-      consumes:
-      - "application/json"
-      - "application/xml"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Pet object that needs to be added to the store"
-        required: true
-        schema:
-          $ref: "#/definitions/Pet"
-      responses:
-        405:
-          description: "Invalid input"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-    put:
-      tags:
-      - "pet"
-      summary: "Update an existing pet"
-      description: ""
-      operationId: "updatePet"
-      consumes:
-      - "application/json"
-      - "application/xml"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Pet object that needs to be added to the store"
-        required: true
-        schema:
-          $ref: "#/definitions/Pet"
-      responses:
-        400:
-          description: "Invalid ID supplied"
-        404:
-          description: "Pet not found"
-        405:
-          description: "Validation exception"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-  /pet/findByStatus:
-    get:
-      tags:
-      - "pet"
-      summary: "Finds Pets by status"
-      description: "Multiple status values can be provided with comma separated strings"
-      operationId: "findPetsByStatus"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "status"
-        in: "query"
-        description: "Status values that need to be considered for filter"
-        required: true
-        type: "array"
-        items:
-          type: "string"
+        - name: Accept
+          in: header
+          required: true
+          type: string
+          description: ''
+        - name: Content-Type
+          in: header
+          required: false
           enum:
-          - "available"
-          - "pending"
-          - "sold"
-          default: "available"
-        collectionFormat: "multi"
-      responses:
-        200:
-          description: "successful operation"
+            - application/json
+          type: string
+          description: ''
+        - name: Body
+          in: body
+          required: true
+          description: ''
           schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Pet"
-        400:
-          description: "Invalid status value"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-  /pet/findByTags:
-    get:
-      tags:
-      - "pet"
-      summary: "Finds Pets by tags"
-      description: "Multiple tags can be provided with comma separated strings. Use\
-        \ tag1, tag2, tag3 for testing."
-      operationId: "findPetsByTags"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "tags"
-        in: "query"
-        description: "Tags to filter by"
-        required: true
-        type: "array"
-        items:
-          type: "string"
-        collectionFormat: "multi"
+            $ref: '#/definitions/EncodeRequest'
       responses:
-        200:
-          description: "successful operation"
+        '200':
+          description: OK
           schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Pet"
-        400:
-          description: "Invalid tag value"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-      deprecated: true
-  /pet/{petId}:
-    get:
-      tags:
-      - "pet"
-      summary: "Find pet by ID"
-      description: "Returns a single pet"
-      operationId: "getPetById"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "petId"
-        in: "path"
-        description: "ID of pet to return"
-        required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Pet"
-        400:
-          description: "Invalid ID supplied"
-        404:
-          description: "Pet not found"
-      security:
-      - api_key: []
-    post:
-      tags:
-      - "pet"
-      summary: "Updates a pet in the store with form data"
-      description: ""
-      operationId: "updatePetWithForm"
-      consumes:
-      - "application/x-www-form-urlencoded"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "petId"
-        in: "path"
-        description: "ID of pet that needs to be updated"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "name"
-        in: "formData"
-        description: "Updated name of the pet"
-        required: false
-        type: "string"
-      - name: "status"
-        in: "formData"
-        description: "Updated status of the pet"
-        required: false
-        type: "string"
-      responses:
-        405:
-          description: "Invalid input"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-    delete:
-      tags:
-      - "pet"
-      summary: "Deletes a pet"
-      description: ""
-      operationId: "deletePet"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "api_key"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "petId"
-        in: "path"
-        description: "Pet id to delete"
-        required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        400:
-          description: "Invalid ID supplied"
-        404:
-          description: "Pet not found"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-  /store/order:
-    post:
-      tags:
-      - "store"
-      summary: "Place an order for a pet"
-      description: ""
-      operationId: "placeOrder"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "order placed for purchasing the pet"
-        required: true
-        schema:
-          $ref: "#/definitions/Order"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Order"
-        400:
-          description: "Invalid Order"
-  /store/order/{orderId}:
-    get:
-      tags:
-      - "store"
-      summary: "Find purchase order by ID"
-      description: "For valid response try integer IDs with value >= 1 and <= 10.\
-        \ Other values will generated exceptions"
-      operationId: "getOrderById"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "orderId"
-        in: "path"
-        description: "ID of pet that needs to be fetched"
-        required: true
-        type: "integer"
-        maximum: 10
-        minimum: 1
-        format: "int64"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Order"
-        400:
-          description: "Invalid ID supplied"
-        404:
-          description: "Order not found"
-    delete:
-      tags:
-      - "store"
-      summary: "Delete purchase order by ID"
-      description: "For valid response try integer IDs with positive integer value.\
-        \ Negative or non-integer values will generate API errors"
-      operationId: "deleteOrder"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "orderId"
-        in: "path"
-        description: "ID of the order that needs to be deleted"
-        required: true
-        type: "integer"
-        minimum: 1
-        format: "int64"
-      responses:
-        400:
-          description: "Invalid ID supplied"
-        404:
-          description: "Order not found"
-  /store/inventory:
-    get:
-      tags:
-      - "store"
-      summary: "Returns pet inventories by status"
-      description: "Returns a map of status codes to quantities"
-      operationId: "getInventory"
-      produces:
-      - "application/json"
-      parameters: []
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            type: "object"
-            additionalProperties:
-              type: "integer"
-              format: "int32"
-      security:
-      - api_key: []
-  /user/createWithArray:
-    post:
-      tags:
-      - "user"
-      summary: "Creates list of users with given input array"
-      description: ""
-      operationId: "createUsersWithArrayInput"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "List of user object"
-        required: true
-        schema:
-          type: "array"
-          items:
-            $ref: "#/definitions/User"
-      responses:
-        default:
-          description: "successful operation"
-  /user/createWithList:
-    post:
-      tags:
-      - "user"
-      summary: "Creates list of users with given input array"
-      description: ""
-      operationId: "createUsersWithListInput"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "List of user object"
-        required: true
-        schema:
-          type: "array"
-          items:
-            $ref: "#/definitions/User"
-      responses:
-        default:
-          description: "successful operation"
-  /user/{username}:
-    get:
-      tags:
-      - "user"
-      summary: "Get user by user name"
-      description: ""
-      operationId: "getUserByName"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "username"
-        in: "path"
-        description: "The name that needs to be fetched. Use user1 for testing. "
-        required: true
-        type: "string"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/User"
-        400:
-          description: "Invalid username supplied"
-        404:
-          description: "User not found"
-    put:
-      tags:
-      - "user"
-      summary: "Updated user"
-      description: "This can only be done by the logged in user."
-      operationId: "updateUser"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "username"
-        in: "path"
-        description: "name that need to be updated"
-        required: true
-        type: "string"
-      - in: "body"
-        name: "body"
-        description: "Updated user object"
-        required: true
-        schema:
-          $ref: "#/definitions/User"
-      responses:
-        400:
-          description: "Invalid user supplied"
-        404:
-          description: "User not found"
-    delete:
-      tags:
-      - "user"
-      summary: "Delete user"
-      description: "This can only be done by the logged in user."
-      operationId: "deleteUser"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "username"
-        in: "path"
-        description: "The name that needs to be deleted"
-        required: true
-        type: "string"
-      responses:
-        400:
-          description: "Invalid username supplied"
-        404:
-          description: "User not found"
-  /user/login:
-    get:
-      tags:
-      - "user"
-      summary: "Logs user into the system"
-      description: ""
-      operationId: "loginUser"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "username"
-        in: "query"
-        description: "The user name for login"
-        required: true
-        type: "string"
-      - name: "password"
-        in: "query"
-        description: "The password for login in clear text"
-        required: true
-        type: "string"
-      responses:
-        200:
-          description: "successful operation"
+            $ref: '#/definitions/Response'
+          examples:
+            application/json:
+              success: true
+              error: null
+              message: Data retrieved.
+              data: ZGVtby1zdWFkbWluOlByZWRpY3REU00zMjEr
           headers:
-            X-Expires-After:
-              type: "string"
-              format: "date-time"
-              description: "date in UTC when token expires"
-            X-Rate-Limit:
-              type: "integer"
-              format: "int32"
-              description: "calls per hour allowed by the user"
-          schema:
-            type: "string"
-        400:
-          description: "Invalid username/password supplied"
-  /user/logout:
-    get:
-      tags:
-      - "user"
-      summary: "Logs out current logged in user session"
-      description: ""
-      operationId: "logoutUser"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters: []
-      responses:
-        default:
-          description: "successful operation"
-  /user:
+            Date:
+              type: string
+              default: Sun, 06 Mar 2022 16:45:09 GMT
+            Server:
+              type: string
+              default: Apache/2.4.51 (Win64) OpenSSL/1.1.1d PHP/7.4.3
+            X-Powered-By:
+              type: string
+              default: PHP/7.4.3
+            Cache-Control:
+              type: string
+              default: no-cache, private
+            X-RateLimit-Limit:
+              type: string
+              default: '60'
+            X-RateLimit-Remaining:
+              type: string
+              default: '59'
+            Content-Length:
+              type: string
+              default: '103'
+            Keep-Alive:
+              type: string
+              default: timeout=5, max=100
+            Connection:
+              type: string
+              default: Keep-Alive
+  /alarm-types:
     post:
+      summary: Alarm Types
       tags:
-      - "user"
-      summary: "Create user"
-      description: "This can only be done by the logged in user."
-      operationId: "createUser"
-      consumes:
-      - "application/json"
+        - V2
+      operationId: AlarmTypes
+      deprecated: false
       produces:
-      - "application/json"
-      - "application/xml"
+        - application/json
+      consumes:
+        - application/json
       parameters:
-      - in: "body"
-        name: "body"
-        description: "Created user object"
-        required: true
-        schema:
-          $ref: "#/definitions/User"
+        - name: Accept
+          in: header
+          required: true
+          type: string
+          description: ''
+        - name: Content-Type
+          in: header
+          required: false
+          enum:
+            - application/json
+          type: string
+          description: ''
+        - name: Body
+          in: body
+          required: true
+          description: ''
+          schema:
+            $ref: '#/definitions/AlarmTypesRequest'
       responses:
-        default:
-          description: "successful operation"
-securityDefinitions:
-  api_key:
-    type: "apiKey"
-    name: "api_key"
-    in: "header"
-  petstore_auth:
-    type: "oauth2"
-    authorizationUrl: "https://petstore.swagger.io/oauth/authorize"
-    flow: "implicit"
-    scopes:
-      read:pets: "read your pets"
-      write:pets: "modify pets in your account"
-definitions:
-  ApiResponse:
-    type: "object"
-    properties:
-      code:
-        type: "integer"
-        format: "int32"
-      type:
-        type: "string"
-      message:
-        type: "string"
-  Category:
-    type: "object"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
-      name:
-        type: "string"
-    xml:
-      name: "Category"
-  Pet:
-    type: "object"
-    required:
-    - "name"
-    - "photoUrls"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
-      category:
-        $ref: "#/definitions/Category"
-      name:
-        type: "string"
-        example: "doggie"
-      photoUrls:
-        type: "array"
-        xml:
-          wrapped: true
-        items:
-          type: "string"
-          xml:
-            name: "photoUrl"
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Response1'
+          examples:
+            application/json:
+              success: true
+              error: null
+              message: Driver retrieved.
+              data:
+                - Camera-covering alarm
+                - Driver Distraction
+                - Driver Fatigue
+                - Forward Collision Warning
+                - High-speed alarm
+                - IO 1
+                - No driver
+                - Phone Detection
+                - Smoking Detection
+                - Video loss alarm
+                - Yawning Detection
+              total_data: 11
+          headers:
+            Date:
+              type: string
+              default: Sun, 06 Mar 2022 16:57:09 GMT
+            Server:
+              type: string
+              default: Apache/2.4.51 (Win64) OpenSSL/1.1.1d PHP/7.4.3
+            X-Powered-By:
+              type: string
+              default: PHP/7.4.3
+            Cache-Control:
+              type: string
+              default: no-cache, private
+            X-RateLimit-Limit:
+              type: string
+              default: '60'
+            X-RateLimit-Remaining:
+              type: string
+              default: '60'
+            Content-Length:
+              type: string
+              default: '289'
+            Keep-Alive:
+              type: string
+              default: timeout=5, max=100
+            Connection:
+              type: string
+              default: Keep-Alive
+  /sites:
+    post:
+      summary: Sites
       tags:
-        type: "array"
-        xml:
-          wrapped: true
-        items:
-          xml:
-            name: "tag"
-          $ref: "#/definitions/Tag"
-      status:
-        type: "string"
-        description: "pet status in the store"
-        enum:
-        - "available"
-        - "pending"
-        - "sold"
-    xml:
-      name: "Pet"
-  Tag:
-    type: "object"
+        - V2
+      operationId: Sites
+      deprecated: false
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - name: Accept
+          in: header
+          required: true
+          type: string
+          description: ''
+        - name: Content-Type
+          in: header
+          required: false
+          enum:
+            - application/json
+          type: string
+          description: ''
+        - name: Body
+          in: body
+          required: true
+          description: ''
+          schema:
+            $ref: '#/definitions/SitesRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Response2'
+          examples:
+            application/json:
+              success: true
+              error: null
+              message: Data retrieved.
+              data:
+                - SiteId: BMOBUS
+                  Name: BMO - BUS
+                - SiteId: BMOFUELTRUCK
+                  Name: BMO - FUEL TRUCK
+                - SiteId: BMOHAULCOAL
+                  Name: BMO - HAULING COAL
+                - SiteId: BMOHAULCOALSUARAN
+                  Name: BMO - HAULING COAL SUARAN
+                - SiteId: BMOMAINHAUL
+                  Name: BMO - OB HAULLER
+              total_data: 5
+          headers:
+            Date:
+              type: string
+              default: Sun, 06 Mar 2022 16:59:34 GMT
+            Server:
+              type: string
+              default: Apache/2.4.51 (Win64) OpenSSL/1.1.1d PHP/7.4.3
+            X-Powered-By:
+              type: string
+              default: PHP/7.4.3
+            Cache-Control:
+              type: string
+              default: no-cache, private
+            X-RateLimit-Limit:
+              type: string
+              default: '60'
+            X-RateLimit-Remaining:
+              type: string
+              default: '58'
+            Content-Length:
+              type: string
+              default: '342'
+            Keep-Alive:
+              type: string
+              default: timeout=5, max=100
+            Connection:
+              type: string
+              default: Keep-Alive
+  /operators:
+    post:
+      summary: Operators
+      tags:
+        - V2
+      operationId: Operators
+      deprecated: false
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - name: Accept
+          in: header
+          required: true
+          type: string
+          description: ''
+        - name: Content-Type
+          in: header
+          required: false
+          enum:
+            - application/json
+          type: string
+          description: ''
+        - name: Body
+          in: body
+          required: true
+          description: ''
+          schema:
+            $ref: '#/definitions/OperatorsRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Response3'
+          examples:
+            application/json:
+              success: true
+              error: null
+              message: Data retrieved.
+              data:
+                - Name: Semol Nico Titawano
+                  OperatorId: 4
+                  NIK: '10026867'
+                - Name: Yosua Sambuaga Tumurang
+                  OperatorId: 5
+                  NIK: '10026868'
+                - Name: Adi Pongsamma
+                  OperatorId: 6
+                  NIK: '10026509'
+                - Name: Jalif
+                  OperatorId: 7
+                  NIK: '10026510'
+                - Name: Moh. Aswan
+                  OperatorId: 8
+                  NIK: '10026511'
+              total_data: 5
+          headers:
+            Date:
+              type: string
+              default: Sun, 06 Mar 2022 17:00:17 GMT
+            Server:
+              type: string
+              default: Apache/2.4.51 (Win64) OpenSSL/1.1.1d PHP/7.4.3
+            X-Powered-By:
+              type: string
+              default: PHP/7.4.3
+            Cache-Control:
+              type: string
+              default: no-cache, private
+            X-RateLimit-Limit:
+              type: string
+              default: '60'
+            X-RateLimit-Remaining:
+              type: string
+              default: '59'
+            Content-Length:
+              type: string
+              default: '371'
+            Keep-Alive:
+              type: string
+              default: timeout=5, max=100
+            Connection:
+              type: string
+              default: Keep-Alive
+  /equipments:
+    post:
+      summary: Equipments
+      tags:
+        - V2
+      operationId: Equipments
+      deprecated: false
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - name: Accept
+          in: header
+          required: true
+          type: string
+          description: ''
+        - name: Content-Type
+          in: header
+          required: false
+          enum:
+            - application/json
+          type: string
+          description: ''
+        - name: Body
+          in: body
+          required: true
+          description: ''
+          schema:
+            $ref: '#/definitions/EquipmentsRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Response4'
+          examples:
+            application/json:
+              success: true
+              error: null
+              message: Data retrieved.
+              data:
+                - EquipmentId: '0099025195'
+                  EquipmentNo: BM 522
+                  EquipmentName: BMO - BM 522 - BUS
+                  Camera:
+                    - CameraId: 0099025195-01
+                      CameraName: ADAS Camera
+                      CameraStatus: Active
+                    - CameraId: 0099025195-02
+                      CameraName: DSM Camera
+                      CameraStatus: Active
+                    - CameraId: 0099025195-03
+                      CameraName: Cabin Camera
+                      CameraStatus: Active
+                - EquipmentId: 00990253CC
+                  EquipmentNo: BM 572
+                  EquipmentName: BMO - BM 572 - BUS
+                  Camera:
+                    - CameraId: 00990253CC-01
+                      CameraName: ADAS Camera
+                      CameraStatus: Active
+                    - CameraId: 00990253CC-02
+                      CameraName: DSM Camera
+                      CameraStatus: Active
+                    - CameraId: 00990253CC-03
+                      CameraName: Cabin Camera
+                      CameraStatus: Active
+              total_data: 2
+          headers:
+            Date:
+              type: string
+              default: Sun, 06 Mar 2022 17:03:56 GMT
+            Server:
+              type: string
+              default: Apache/2.4.51 (Win64) OpenSSL/1.1.1d PHP/7.4.3
+            X-Powered-By:
+              type: string
+              default: PHP/7.4.3
+            Cache-Control:
+              type: string
+              default: no-cache, private
+            X-RateLimit-Limit:
+              type: string
+              default: '60'
+            X-RateLimit-Remaining:
+              type: string
+              default: '57'
+            Content-Length:
+              type: string
+              default: '761'
+            Keep-Alive:
+              type: string
+              default: timeout=5, max=99
+            Connection:
+              type: string
+              default: Keep-Alive
+  /deviations:
+    post:
+      summary: Deviations
+      tags:
+        - V2
+      operationId: Deviations
+      deprecated: false
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - name: Accept
+          in: header
+          required: true
+          type: string
+          description: ''
+        - name: Content-Type
+          in: header
+          required: false
+          enum:
+            - application/json
+          type: string
+          description: ''
+        - name: Body
+          in: body
+          required: true
+          description: ''
+          schema:
+            $ref: '#/definitions/DeviationsRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Deviations'
+          examples:
+            application/json:
+              success: true
+              error: null
+              message: Data retrieved.
+              data:
+                - Longitude: '116.569951'
+                  Latitude: '0.292716'
+                  TicketNumber: IPR - PMVV16143-PDSM00000425
+                  DeviationId: 287042
+                  OperatorId: null
+                  OperatorName: ''
+                  EquipmentId: 00990268AE
+                  EquipmentName: IPR - PMVV16143
+                  EquipmentSpeed: 48
+                  unSafeAct: Driver Fatigue
+                  unSafeActUtcDate: '2022-01-01 14:45:04'
+                  ReportTime: '2022-01-01 15:14:51'
+                  Shift: 2
+                  Duration: 7
+                  Direction: East
+                  Angle: 110
+                  SiteName: IPR - HAULING COAL
+                  ValidationStatus: Validated
+                  FollowupStatus: Close
+                  DeviationEvidences:
+                    - path: http://147.139.186.204:12057/api/v1/basic/mediafile/view?key=zT908g2j9nhExsAmW2pQav62OZEv5FmQhFUqTjrDPjg%3D&dir=RDovRXZpZGVuY2VEYXRhLzIwMjItMDEtMDEvNDA2ODkxL0NIQU5ORUxfMDdfMjAyMjAxMDEyMjQ1MDFfMjAyMjAxMDEyMjQ1MDcubXA0
+                    - path: http://147.139.186.204:12057/api/v1/basic/mediafile/view?key=zT908g2j9nhExsAmW2pQav62OZEv5FmQhFUqTjrDPjg%3D&dir=RDovRXZpZGVuY2VEYXRhLzIwMjItMDEtMDEvNDA2ODkxL0NIQU5ORUxfMDhfMjAyMjAxMDEyMjQ1MDFfMjAyMjAxMDEyMjQ1MDcubXA0
+                    - path: http://147.139.186.204:12057/api/v1/basic/mediafile/view?key=zT908g2j9nhExsAmW2pQav62OZEv5FmQhFUqTjrDPjg%3D&dir=RDovRXZpZGVuY2VEYXRhLzIwMjItMDEtMDEvNDA2ODkxL0NIQU5ORUxfMDFfMjAyMjAxMDEyMjQ1MDFfMjAyMjAxMDEyMjQ1MDcubXA0
+                - Longitude: '116.278100'
+                  Latitude: '0.472105'
+                  TicketNumber: IPR - PMVV16117-PDSM00000309
+                  DeviationId: 286926
+                  OperatorId: null
+                  OperatorName: ''
+                  EquipmentId: 009902517A
+                  EquipmentName: IPR - PMVV16117
+                  EquipmentSpeed: 52
+                  unSafeAct: Driver Fatigue
+                  unSafeActUtcDate: '2022-01-01 12:39:24'
+                  ReportTime: '2022-01-01 13:10:46'
+                  Shift: 2
+                  Duration: 7
+                  Direction: East
+                  Angle: 102
+                  SiteName: IPR - HAULING COAL
+                  ValidationStatus: Validated
+                  FollowupStatus: Close
+                  DeviationEvidences:
+                    - path: http://147.139.186.204:12057/api/v1/basic/mediafile/view?key=zT908g2j9nhExsAmW2pQav62OZEv5FmQhFUqTjrDPjg%3D&dir=RDovRXZpZGVuY2VEYXRhLzIwMjItMDEtMDEvNDA2NzQxL0NIQU5ORUxfMDdfMjAyMjAxMDEyMDM5MjFfMjAyMjAxMDEyMDM5MjcubXA0
+                    - path: http://147.139.186.204:12057/api/v1/basic/mediafile/view?key=zT908g2j9nhExsAmW2pQav62OZEv5FmQhFUqTjrDPjg%3D&dir=RDovRXZpZGVuY2VEYXRhLzIwMjItMDEtMDEvNDA2NzQxL0NIQU5ORUxfMDhfMjAyMjAxMDEyMDM5MjFfMjAyMjAxMDEyMDM5MjcubXA0
+                    - path: http://147.139.186.204:12057/api/v1/basic/mediafile/view?key=zT908g2j9nhExsAmW2pQav62OZEv5FmQhFUqTjrDPjg%3D&dir=RDovRXZpZGVuY2VEYXRhLzIwMjItMDEtMDEvNDA2NzQxL0NIQU5ORUxfMDFfMjAyMjAxMDEyMDM5MjFfMjAyMjAxMDEyMDM5MjcubXA0
+                - Longitude: '116.275741'
+                  Latitude: '0.472320'
+                  TicketNumber: IPR - PMVV16117-PDSM00000324
+                  DeviationId: 286941
+                  OperatorId: null
+                  OperatorName: ''
+                  EquipmentId: 009902517A
+                  EquipmentName: IPR - PMVV16117
+                  EquipmentSpeed: 43
+                  unSafeAct: Driver Fatigue
+                  unSafeActUtcDate: '2022-01-01 12:39:05'
+                  ReportTime: '2022-01-01 13:26:35'
+                  Shift: 2
+                  Duration: 7
+                  Direction: East
+                  Angle: 90
+                  SiteName: IPR - HAULING COAL
+                  ValidationStatus: Validated
+                  FollowupStatus: Close
+                  DeviationEvidences:
+                    - path: http://147.139.186.204:12057/api/v1/basic/mediafile/view?key=zT908g2j9nhExsAmW2pQav62OZEv5FmQhFUqTjrDPjg%3D&dir=RDovRXZpZGVuY2VEYXRhLzIwMjItMDEtMDEvNDA2NzU4L0NIQU5ORUxfMDdfMjAyMjAxMDEyMDM5MDJfMjAyMjAxMDEyMDM5MDgubXA0
+                    - path: http://147.139.186.204:12057/api/v1/basic/mediafile/view?key=zT908g2j9nhExsAmW2pQav62OZEv5FmQhFUqTjrDPjg%3D&dir=RDovRXZpZGVuY2VEYXRhLzIwMjItMDEtMDEvNDA2NzU4L0NIQU5ORUxfMDhfMjAyMjAxMDEyMDM5MDJfMjAyMjAxMDEyMDM5MDgubXA0
+                    - path: http://147.139.186.204:12057/api/v1/basic/mediafile/view?key=zT908g2j9nhExsAmW2pQav62OZEv5FmQhFUqTjrDPjg%3D&dir=RDovRXZpZGVuY2VEYXRhLzIwMjItMDEtMDEvNDA2NzU4L0NIQU5ORUxfMDFfMjAyMjAxMDEyMDM5MDJfMjAyMjAxMDEyMDM5MDgubXA0
+                - Longitude: '116.275331'
+                  Latitude: '0.472320'
+                  TicketNumber: IPR - PMVV16117-PDSM00000371
+                  DeviationId: 286988
+                  OperatorId: null
+                  OperatorName: ''
+                  EquipmentId: 009902517A
+                  EquipmentName: IPR - PMVV16117
+                  EquipmentSpeed: 39
+                  unSafeAct: Driver Fatigue
+                  unSafeActUtcDate: '2022-01-01 12:39:01'
+                  ReportTime: '2022-01-01 14:10:09'
+                  Shift: 2
+                  Duration: 7
+                  Direction: East
+                  Angle: 90
+                  SiteName: IPR - HAULING COAL
+                  ValidationStatus: Validated
+                  FollowupStatus: Close
+                  DeviationEvidences:
+                    - path: http://147.139.186.204:12057/api/v1/basic/mediafile/view?key=zT908g2j9nhExsAmW2pQav62OZEv5FmQhFUqTjrDPjg%3D&dir=RDovRXZpZGVuY2VEYXRhLzIwMjItMDEtMDEvNDA2Nzk1L0NIQU5ORUxfMDdfMjAyMjAxMDEyMDM4NThfMjAyMjAxMDEyMDM5MDQubXA0
+                    - path: http://147.139.186.204:12057/api/v1/basic/mediafile/view?key=zT908g2j9nhExsAmW2pQav62OZEv5FmQhFUqTjrDPjg%3D&dir=RDovRXZpZGVuY2VEYXRhLzIwMjItMDEtMDEvNDA2Nzk1L0NIQU5ORUxfMDhfMjAyMjAxMDEyMDM4NThfMjAyMjAxMDEyMDM5MDQubXA0
+                    - path: http://147.139.186.204:12057/api/v1/basic/mediafile/view?key=zT908g2j9nhExsAmW2pQav62OZEv5FmQhFUqTjrDPjg%3D&dir=RDovRXZpZGVuY2VEYXRhLzIwMjItMDEtMDEvNDA2Nzk1L0NIQU5ORUxfMDFfMjAyMjAxMDEyMDM4NThfMjAyMjAxMDEyMDM5MDQubXA0
+              total_data: 4
+          headers:
+            Date:
+              type: string
+              default: Sun, 06 Mar 2022 17:06:43 GMT
+            Server:
+              type: string
+              default: Apache/2.4.51 (Win64) OpenSSL/1.1.1d PHP/7.4.3
+            X-Powered-By:
+              type: string
+              default: PHP/7.4.3
+            Cache-Control:
+              type: string
+              default: no-cache, private
+            X-RateLimit-Limit:
+              type: string
+              default: '60'
+            X-RateLimit-Remaining:
+              type: string
+              default: '59'
+            Content-Length:
+              type: string
+              default: '4911'
+            Keep-Alive:
+              type: string
+              default: timeout=5, max=100
+            Connection:
+              type: string
+              default: Keep-Alive
+definitions:
+  EncodeRequest:
+    title: EncodeRequest
+    example:
+      origin: https://digital-dev-apm-001.azure-api.net
+      username: demo-suadmin
+      password: PredictDSM321+
+    type: object
     properties:
-      id:
-        type: "integer"
-        format: "int64"
-      name:
-        type: "string"
-    xml:
-      name: "Tag"
-  Order:
-    type: "object"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
-      petId:
-        type: "integer"
-        format: "int64"
-      quantity:
-        type: "integer"
-        format: "int32"
-      shipDate:
-        type: "string"
-        format: "date-time"
-      status:
-        type: "string"
-        description: "Order Status"
-        enum:
-        - "placed"
-        - "approved"
-        - "delivered"
-      complete:
-        type: "boolean"
-    xml:
-      name: "Order"
-  User:
-    type: "object"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
+      origin:
+        type: string
       username:
-        type: "string"
-      firstName:
-        type: "string"
-      lastName:
-        type: "string"
-      email:
-        type: "string"
+        type: string
       password:
-        type: "string"
-      phone:
-        type: "string"
-      userStatus:
-        type: "integer"
-        format: "int32"
-        description: "User Status"
-    xml:
-      name: "User"
-externalDocs:
-  description: "Find out more about Swagger"
-  url: "http://swagger.io"
+        type: string
+    required:
+      - origin
+      - username
+      - password
+  Response:
+    title: Response
+    example:
+      success: true
+      error: null
+      message: Data retrieved.
+      data: ZGVtby1zdWFkbWluOlByZWRpY3REU00zMjEr
+    type: object
+    properties:
+      success:
+        type: boolean
+      error:
+        type: string
+      message:
+        type: string
+      data:
+        type: string
+    required:
+      - success
+      - error
+      - message
+      - data
+  AlarmTypesRequest:
+    title: AlarmTypesRequest
+    example:
+      origin: https://digital-dev-apm-001.azure-api.net
+      api_token: ZGVtby1zdWFkbWluOlByZWRpY3REU00zMjEr
+      search: ''
+      size: 100
+    type: object
+    properties:
+      origin:
+        type: string
+      api_token:
+        type: string
+      search:
+        type: string
+      size:
+        type: integer
+        format: int32
+    required:
+      - origin
+      - api_token
+      - search
+      - size
+  Response1:
+    title: Response1
+    example:
+      success: true
+      error: null
+      message: Driver retrieved.
+      data:
+        - Camera-covering alarm
+        - Driver Distraction
+        - Driver Fatigue
+        - Forward Collision Warning
+        - High-speed alarm
+        - IO 1
+        - No driver
+        - Phone Detection
+        - Smoking Detection
+        - Video loss alarm
+        - Yawning Detection
+      total_data: 11
+    type: object
+    properties:
+      success:
+        type: boolean
+      error:
+        type: string
+      message:
+        type: string
+      data:
+        type: array
+        items:
+          type: string
+      total_data:
+        type: integer
+        format: int32
+    required:
+      - success
+      - error
+      - message
+      - data
+      - total_data
+  SitesRequest:
+    title: SitesRequest
+    example:
+      origin: https://digital-dev-apm-001.azure-api.net
+      api_token: ZGVtby1zdWFkbWluOlByZWRpY3REU00zMjEr
+      search: ''
+      size: 5
+    type: object
+    properties:
+      origin:
+        type: string
+      api_token:
+        type: string
+      search:
+        type: string
+      size:
+        type: integer
+        format: int32
+    required:
+      - origin
+      - api_token
+      - search
+      - size
+  Response2:
+    title: Response2
+    example:
+      success: true
+      error: null
+      message: Data retrieved.
+      data:
+        - SiteId: BMOBUS
+          Name: BMO - BUS
+        - SiteId: BMOFUELTRUCK
+          Name: BMO - FUEL TRUCK
+        - SiteId: BMOHAULCOAL
+          Name: BMO - HAULING COAL
+        - SiteId: BMOHAULCOALSUARAN
+          Name: BMO - HAULING COAL SUARAN
+        - SiteId: BMOMAINHAUL
+          Name: BMO - OB HAULLER
+      total_data: 5
+    type: object
+    properties:
+      success:
+        type: boolean
+      error:
+        type: string
+      message:
+        type: string
+      data:
+        type: array
+        items:
+          $ref: '#/definitions/Datum'
+      total_data:
+        type: integer
+        format: int32
+    required:
+      - success
+      - error
+      - message
+      - data
+      - total_data
+  Datum:
+    title: Datum
+    example:
+      SiteId: BMOBUS
+      Name: BMO - BUS
+    type: object
+    properties:
+      SiteId:
+        type: string
+      Name:
+        type: string
+    required:
+      - SiteId
+      - Name
+  OperatorsRequest:
+    title: OperatorsRequest
+    example:
+      origin: https://digital-dev-apm-001.azure-api.net
+      api_token: ZGVtby1zdWFkbWluOlByZWRpY3REU00zMjEr
+      search: ''
+      size: 5
+    type: object
+    properties:
+      origin:
+        type: string
+      api_token:
+        type: string
+      search:
+        type: string
+      size:
+        type: integer
+        format: int32
+    required:
+      - origin
+      - api_token
+      - search
+      - size
+  Response3:
+    title: Response3
+    example:
+      success: true
+      error: null
+      message: Data retrieved.
+      data:
+        - Name: Semol Nico Titawano
+          OperatorId: 4
+          NIK: '10026867'
+        - Name: Yosua Sambuaga Tumurang
+          OperatorId: 5
+          NIK: '10026868'
+        - Name: Adi Pongsamma
+          OperatorId: 6
+          NIK: '10026509'
+        - Name: Jalif
+          OperatorId: 7
+          NIK: '10026510'
+        - Name: Moh. Aswan
+          OperatorId: 8
+          NIK: '10026511'
+      total_data: 5
+    type: object
+    properties:
+      success:
+        type: boolean
+      error:
+        type: string
+      message:
+        type: string
+      data:
+        type: array
+        items:
+          $ref: '#/definitions/Datum1'
+      total_data:
+        type: integer
+        format: int32
+    required:
+      - success
+      - error
+      - message
+      - data
+      - total_data
+  Datum1:
+    title: Datum1
+    example:
+      Name: Semol Nico Titawano
+      OperatorId: 4
+      NIK: '10026867'
+    type: object
+    properties:
+      Name:
+        type: string
+      OperatorId:
+        type: integer
+        format: int32
+      NIK:
+        type: string
+    required:
+      - Name
+      - OperatorId
+      - NIK
+  EquipmentsRequest:
+    title: EquipmentsRequest
+    example:
+      origin: https://digital-dev-apm-001.azure-api.net
+      api_token: ZGVtby1zdWFkbWluOlByZWRpY3REU00zMjEr
+      search: ''
+      siteId:
+        - BMOBUS
+      size: 100
+    type: object
+    properties:
+      origin:
+        type: string
+      api_token:
+        type: string
+      search:
+        type: string
+      siteId:
+        type: array
+        items:
+          type: string
+      size:
+        type: integer
+        format: int32
+    required:
+      - origin
+      - api_token
+      - search
+      - siteId
+      - size
+  Response4:
+    title: Response4
+    example:
+      success: true
+      error: null
+      message: Data retrieved.
+      data:
+        - EquipmentId: '0099025195'
+          EquipmentNo: BM 522
+          EquipmentName: BMO - BM 522 - BUS
+          Camera:
+            - CameraId: 0099025195-01
+              CameraName: ADAS Camera
+              CameraStatus: Active
+            - CameraId: 0099025195-02
+              CameraName: DSM Camera
+              CameraStatus: Active
+            - CameraId: 0099025195-03
+              CameraName: Cabin Camera
+              CameraStatus: Active
+        - EquipmentId: 00990253CC
+          EquipmentNo: BM 572
+          EquipmentName: BMO - BM 572 - BUS
+          Camera:
+            - CameraId: 00990253CC-01
+              CameraName: ADAS Camera
+              CameraStatus: Active
+            - CameraId: 00990253CC-02
+              CameraName: DSM Camera
+              CameraStatus: Active
+            - CameraId: 00990253CC-03
+              CameraName: Cabin Camera
+              CameraStatus: Active
+      total_data: 2
+    type: object
+    properties:
+      success:
+        type: boolean
+      error:
+        type: string
+      message:
+        type: string
+      data:
+        type: array
+        items:
+          $ref: '#/definitions/Datum2'
+      total_data:
+        type: integer
+        format: int32
+    required:
+      - success
+      - error
+      - message
+      - data
+      - total_data
+  Datum2:
+    title: Datum2
+    example:
+      EquipmentId: '0099025195'
+      EquipmentNo: BM 522
+      EquipmentName: BMO - BM 522 - BUS
+      Camera:
+        - CameraId: 0099025195-01
+          CameraName: ADAS Camera
+          CameraStatus: Active
+        - CameraId: 0099025195-02
+          CameraName: DSM Camera
+          CameraStatus: Active
+        - CameraId: 0099025195-03
+          CameraName: Cabin Camera
+          CameraStatus: Active
+    type: object
+    properties:
+      EquipmentId:
+        type: string
+      EquipmentNo:
+        type: string
+      EquipmentName:
+        type: string
+      Camera:
+        type: array
+        items:
+          $ref: '#/definitions/Camera'
+    required:
+      - EquipmentId
+      - EquipmentNo
+      - EquipmentName
+      - Camera
+  Camera:
+    title: Camera
+    example:
+      CameraId: 0099025195-01
+      CameraName: ADAS Camera
+      CameraStatus: Active
+    type: object
+    properties:
+      CameraId:
+        type: string
+      CameraName:
+        type: string
+      CameraStatus:
+        type: string
+    required:
+      - CameraId
+      - CameraName
+      - CameraStatus
+  DeviationsRequest:
+    title: DeviationsRequest
+    example:
+      origin: https://digital-dev-apm-001.azure-api.net
+      api_token: ZGVtby1zdWFkbWluOlByZWRpY3REU00zMjEr
+      search: ''
+      StartTime: '2022-01-01 00:00:00'
+      EndTime: '2022-01-01 23:59:59'
+      SiteId: []
+      EquipmentId: []
+      AlarmTypes:
+        - Driver Fatigue
+      ValidationStatus:
+        - Pending
+        - Validated
+      FollowupStatus:
+        - Open
+        - Close
+      OperatorId: []
+      size: 20
+    type: object
+    properties:
+      origin:
+        type: string
+      api_token:
+        type: string
+      search:
+        type: string
+      StartTime:
+        type: string
+      EndTime:
+        type: string
+      SiteId:
+        type: array
+        items:
+          type: string
+      EquipmentId:
+        type: array
+        items:
+          type: string
+      AlarmTypes:
+        type: array
+        items:
+          type: string
+      ValidationStatus:
+        type: array
+        items:
+          type: string
+      FollowupStatus:
+        type: array
+        items:
+          type: string
+      OperatorId:
+        type: array
+        items:
+          type: string
+      size:
+        type: integer
+        format: int32
+    required:
+      - origin
+      - api_token
+      - search
+      - StartTime
+      - EndTime
+      - SiteId
+      - EquipmentId
+      - AlarmTypes
+      - ValidationStatus
+      - FollowupStatus
+      - OperatorId
+      - size
+  Deviations:
+    title: Deviations
+    example:
+      success: true
+      error: null
+      message: Data retrieved.
+      data:
+        - Longitude: '116.569951'
+          Latitude: '0.292716'
+          TicketNumber: IPR - PMVV16143-PDSM00000425
+          DeviationId: 287042
+          OperatorId: null
+          OperatorName: ''
+          EquipmentId: 00990268AE
+          EquipmentName: IPR - PMVV16143
+          EquipmentSpeed: 48
+          unSafeAct: Driver Fatigue
+          unSafeActUtcDate: '2022-01-01 14:45:04'
+          ReportTime: '2022-01-01 15:14:51'
+          Shift: 2
+          Duration: 7
+          Direction: East
+          Angle: 110
+          SiteName: IPR - HAULING COAL
+          ValidationStatus: Validated
+          FollowupStatus: Close
+          DeviationEvidences:
+            - path: http://147.139.186.204:12057/api/v1/basic/mediafile/view?key=zT908g2j9nhExsAmW2pQav62OZEv5FmQhFUqTjrDPjg%3D&dir=RDovRXZpZGVuY2VEYXRhLzIwMjItMDEtMDEvNDA2ODkxL0NIQU5ORUxfMDdfMjAyMjAxMDEyMjQ1MDFfMjAyMjAxMDEyMjQ1MDcubXA0
+            - path: http://147.139.186.204:12057/api/v1/basic/mediafile/view?key=zT908g2j9nhExsAmW2pQav62OZEv5FmQhFUqTjrDPjg%3D&dir=RDovRXZpZGVuY2VEYXRhLzIwMjItMDEtMDEvNDA2ODkxL0NIQU5ORUxfMDhfMjAyMjAxMDEyMjQ1MDFfMjAyMjAxMDEyMjQ1MDcubXA0
+            - path: http://147.139.186.204:12057/api/v1/basic/mediafile/view?key=zT908g2j9nhExsAmW2pQav62OZEv5FmQhFUqTjrDPjg%3D&dir=RDovRXZpZGVuY2VEYXRhLzIwMjItMDEtMDEvNDA2ODkxL0NIQU5ORUxfMDFfMjAyMjAxMDEyMjQ1MDFfMjAyMjAxMDEyMjQ1MDcubXA0
+        - Longitude: '116.278100'
+          Latitude: '0.472105'
+          TicketNumber: IPR - PMVV16117-PDSM00000309
+          DeviationId: 286926
+          OperatorId: null
+          OperatorName: ''
+          EquipmentId: 009902517A
+          EquipmentName: IPR - PMVV16117
+          EquipmentSpeed: 52
+          unSafeAct: Driver Fatigue
+          unSafeActUtcDate: '2022-01-01 12:39:24'
+          ReportTime: '2022-01-01 13:10:46'
+          Shift: 2
+          Duration: 7
+          Direction: East
+          Angle: 102
+          SiteName: IPR - HAULING COAL
+          ValidationStatus: Validated
+          FollowupStatus: Close
+          DeviationEvidences:
+            - path: http://147.139.186.204:12057/api/v1/basic/mediafile/view?key=zT908g2j9nhExsAmW2pQav62OZEv5FmQhFUqTjrDPjg%3D&dir=RDovRXZpZGVuY2VEYXRhLzIwMjItMDEtMDEvNDA2NzQxL0NIQU5ORUxfMDdfMjAyMjAxMDEyMDM5MjFfMjAyMjAxMDEyMDM5MjcubXA0
+            - path: http://147.139.186.204:12057/api/v1/basic/mediafile/view?key=zT908g2j9nhExsAmW2pQav62OZEv5FmQhFUqTjrDPjg%3D&dir=RDovRXZpZGVuY2VEYXRhLzIwMjItMDEtMDEvNDA2NzQxL0NIQU5ORUxfMDhfMjAyMjAxMDEyMDM5MjFfMjAyMjAxMDEyMDM5MjcubXA0
+            - path: http://147.139.186.204:12057/api/v1/basic/mediafile/view?key=zT908g2j9nhExsAmW2pQav62OZEv5FmQhFUqTjrDPjg%3D&dir=RDovRXZpZGVuY2VEYXRhLzIwMjItMDEtMDEvNDA2NzQxL0NIQU5ORUxfMDFfMjAyMjAxMDEyMDM5MjFfMjAyMjAxMDEyMDM5MjcubXA0
+        - Longitude: '116.275741'
+          Latitude: '0.472320'
+          TicketNumber: IPR - PMVV16117-PDSM00000324
+          DeviationId: 286941
+          OperatorId: null
+          OperatorName: ''
+          EquipmentId: 009902517A
+          EquipmentName: IPR - PMVV16117
+          EquipmentSpeed: 43
+          unSafeAct: Driver Fatigue
+          unSafeActUtcDate: '2022-01-01 12:39:05'
+          ReportTime: '2022-01-01 13:26:35'
+          Shift: 2
+          Duration: 7
+          Direction: East
+          Angle: 90
+          SiteName: IPR - HAULING COAL
+          ValidationStatus: Validated
+          FollowupStatus: Close
+          DeviationEvidences:
+            - path: http://147.139.186.204:12057/api/v1/basic/mediafile/view?key=zT908g2j9nhExsAmW2pQav62OZEv5FmQhFUqTjrDPjg%3D&dir=RDovRXZpZGVuY2VEYXRhLzIwMjItMDEtMDEvNDA2NzU4L0NIQU5ORUxfMDdfMjAyMjAxMDEyMDM5MDJfMjAyMjAxMDEyMDM5MDgubXA0
+            - path: http://147.139.186.204:12057/api/v1/basic/mediafile/view?key=zT908g2j9nhExsAmW2pQav62OZEv5FmQhFUqTjrDPjg%3D&dir=RDovRXZpZGVuY2VEYXRhLzIwMjItMDEtMDEvNDA2NzU4L0NIQU5ORUxfMDhfMjAyMjAxMDEyMDM5MDJfMjAyMjAxMDEyMDM5MDgubXA0
+            - path: http://147.139.186.204:12057/api/v1/basic/mediafile/view?key=zT908g2j9nhExsAmW2pQav62OZEv5FmQhFUqTjrDPjg%3D&dir=RDovRXZpZGVuY2VEYXRhLzIwMjItMDEtMDEvNDA2NzU4L0NIQU5ORUxfMDFfMjAyMjAxMDEyMDM5MDJfMjAyMjAxMDEyMDM5MDgubXA0
+        - Longitude: '116.275331'
+          Latitude: '0.472320'
+          TicketNumber: IPR - PMVV16117-PDSM00000371
+          DeviationId: 286988
+          OperatorId: null
+          OperatorName: ''
+          EquipmentId: 009902517A
+          EquipmentName: IPR - PMVV16117
+          EquipmentSpeed: 39
+          unSafeAct: Driver Fatigue
+          unSafeActUtcDate: '2022-01-01 12:39:01'
+          ReportTime: '2022-01-01 14:10:09'
+          Shift: 2
+          Duration: 7
+          Direction: East
+          Angle: 90
+          SiteName: IPR - HAULING COAL
+          ValidationStatus: Validated
+          FollowupStatus: Close
+          DeviationEvidences:
+            - path: http://147.139.186.204:12057/api/v1/basic/mediafile/view?key=zT908g2j9nhExsAmW2pQav62OZEv5FmQhFUqTjrDPjg%3D&dir=RDovRXZpZGVuY2VEYXRhLzIwMjItMDEtMDEvNDA2Nzk1L0NIQU5ORUxfMDdfMjAyMjAxMDEyMDM4NThfMjAyMjAxMDEyMDM5MDQubXA0
+            - path: http://147.139.186.204:12057/api/v1/basic/mediafile/view?key=zT908g2j9nhExsAmW2pQav62OZEv5FmQhFUqTjrDPjg%3D&dir=RDovRXZpZGVuY2VEYXRhLzIwMjItMDEtMDEvNDA2Nzk1L0NIQU5ORUxfMDhfMjAyMjAxMDEyMDM4NThfMjAyMjAxMDEyMDM5MDQubXA0
+            - path: http://147.139.186.204:12057/api/v1/basic/mediafile/view?key=zT908g2j9nhExsAmW2pQav62OZEv5FmQhFUqTjrDPjg%3D&dir=RDovRXZpZGVuY2VEYXRhLzIwMjItMDEtMDEvNDA2Nzk1L0NIQU5ORUxfMDFfMjAyMjAxMDEyMDM4NThfMjAyMjAxMDEyMDM5MDQubXA0
+      total_data: 4
+    type: object
+    properties:
+      success:
+        type: boolean
+      error:
+        type: string
+      message:
+        type: string
+      data:
+        type: array
+        items:
+          $ref: '#/definitions/Datum3'
+      total_data:
+        type: integer
+        format: int32
+    required:
+      - success
+      - error
+      - message
+      - data
+      - total_data
+  Datum3:
+    title: Datum3
+    example:
+      Longitude: '116.569951'
+      Latitude: '0.292716'
+      TicketNumber: IPR - PMVV16143-PDSM00000425
+      DeviationId: 287042
+      OperatorId: null
+      OperatorName: ''
+      EquipmentId: 00990268AE
+      EquipmentName: IPR - PMVV16143
+      EquipmentSpeed: 48
+      unSafeAct: Driver Fatigue
+      unSafeActUtcDate: '2022-01-01 14:45:04'
+      ReportTime: '2022-01-01 15:14:51'
+      Shift: 2
+      Duration: 7
+      Direction: East
+      Angle: 110
+      SiteName: IPR - HAULING COAL
+      ValidationStatus: Validated
+      FollowupStatus: Close
+      DeviationEvidences:
+        - path: http://147.139.186.204:12057/api/v1/basic/mediafile/view?key=zT908g2j9nhExsAmW2pQav62OZEv5FmQhFUqTjrDPjg%3D&dir=RDovRXZpZGVuY2VEYXRhLzIwMjItMDEtMDEvNDA2ODkxL0NIQU5ORUxfMDdfMjAyMjAxMDEyMjQ1MDFfMjAyMjAxMDEyMjQ1MDcubXA0
+        - path: http://147.139.186.204:12057/api/v1/basic/mediafile/view?key=zT908g2j9nhExsAmW2pQav62OZEv5FmQhFUqTjrDPjg%3D&dir=RDovRXZpZGVuY2VEYXRhLzIwMjItMDEtMDEvNDA2ODkxL0NIQU5ORUxfMDhfMjAyMjAxMDEyMjQ1MDFfMjAyMjAxMDEyMjQ1MDcubXA0
+        - path: http://147.139.186.204:12057/api/v1/basic/mediafile/view?key=zT908g2j9nhExsAmW2pQav62OZEv5FmQhFUqTjrDPjg%3D&dir=RDovRXZpZGVuY2VEYXRhLzIwMjItMDEtMDEvNDA2ODkxL0NIQU5ORUxfMDFfMjAyMjAxMDEyMjQ1MDFfMjAyMjAxMDEyMjQ1MDcubXA0
+    type: object
+    properties:
+      Longitude:
+        type: string
+      Latitude:
+        type: string
+      TicketNumber:
+        type: string
+      DeviationId:
+        type: integer
+        format: int32
+      OperatorId:
+        type: string
+      OperatorName:
+        type: string
+      EquipmentId:
+        type: string
+      EquipmentName:
+        type: string
+      EquipmentSpeed:
+        type: integer
+        format: int32
+      unSafeAct:
+        type: string
+      unSafeActUtcDate:
+        type: string
+      ReportTime:
+        type: string
+      Shift:
+        type: integer
+        format: int32
+      Duration:
+        type: integer
+        format: int32
+      Direction:
+        type: string
+      Angle:
+        type: integer
+        format: int32
+      SiteName:
+        type: string
+      ValidationStatus:
+        type: string
+      FollowupStatus:
+        type: string
+      DeviationEvidences:
+        type: array
+        items:
+          $ref: '#/definitions/DeviationEvidence'
+    required:
+      - Longitude
+      - Latitude
+      - TicketNumber
+      - DeviationId
+      - OperatorId
+      - OperatorName
+      - EquipmentId
+      - EquipmentName
+      - EquipmentSpeed
+      - unSafeAct
+      - unSafeActUtcDate
+      - ReportTime
+      - Shift
+      - Duration
+      - Direction
+      - Angle
+      - SiteName
+      - ValidationStatus
+      - FollowupStatus
+      - DeviationEvidences
+  DeviationEvidence:
+    title: DeviationEvidence
+    example:
+      path: http://147.139.186.204:12057/api/v1/basic/mediafile/view?key=zT908g2j9nhExsAmW2pQav62OZEv5FmQhFUqTjrDPjg%3D&dir=RDovRXZpZGVuY2VEYXRhLzIwMjItMDEtMDEvNDA2ODkxL0NIQU5ORUxfMDdfMjAyMjAxMDEyMjQ1MDFfMjAyMjAxMDEyMjQ1MDcubXA0
+    type: object
+    properties:
+      path:
+        type: string
+    required:
+      - path
+tags:
+  - name: V2
